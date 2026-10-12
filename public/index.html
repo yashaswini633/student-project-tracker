@@ -1,5 +1,44 @@
 <!doctype html>
+
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Workshop readiness</title></head>
-<body><main><h1>Student Project Tracker</h1><p>Readiness check passed. We will build the interface in Session 1.</p></main></body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Project Tracker</title>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Student Project Tracker</h1>
+      <p>Keep track of your electronics projects, their progress, and current status.</p>
+    </header><section aria-labelledby="form-heading">
+  <h2 id="form-heading">Add a Project</h2>
+  <form>
+    <div>
+      <label for="project-name">Project name</label>
+      <input type="text" id="project-name" name="projectName" placeholder="e.g. IoT Monitor" required>
+    </div>
+
+    <div>
+      <label for="project-status">Project status</label>
+      <select id="project-status" name="projectStatus">
+        <option value="Planning">Planning</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+
+    <button type="submit">Add Project</button>
+  </form>
+  <p id="form-message" role="status"></p>
+</section>
+
+<section aria-labelledby="projects-heading">
+  <h2 id="projects-heading">Your Projects</h2>
+  <p id="empty-message">No projects have been added yet.</p>
+  <ul id="project-list"></ul>
+</section>
+
+  </main>
+</body>
 </html>
