@@ -1,1 +1,154 @@
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.6;
+  color: #1f2937;
+  background-color: #f3f6f8;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Page heading */
+header {
+  margin-bottom: 32px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  color: #16324f;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+header p {
+  margin: 0;
+  color: #526174;
+}
+
+/* Content sections */
+section {
+  margin-bottom: 24px;
+  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid #dce3e9;
+  border-radius: 12px;
+}
+
+h2 {
+  margin: 0 0 20px;
+  color: #16324f;
+  font-size: 1.35rem;
+}
+
+/* Form layout */
+form {
+  display: grid;
+  gap: 18px;
+}
+
+form div {
+  display: grid;
+  gap: 6px;
+}
+
+label {
+  font-weight: 600;
+}
+
+input,
+select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  font: inherit;
+  color: inherit;
+  background-color: #ffffff;
+  border: 1px solid #aab7c4;
+  border-radius: 6px;
+}
+
+input::placeholder {
+  color: #738195;
+}
+
+/* Primary action */
+button {
+  width: fit-content;
+  min-height: 44px;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #16734b;
+  border: 1px solid #16734b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #105b3b;
+  border-color: #105b3b;
+}
+
+/* Visible keyboard focus */
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Feedback and project list */
+#form-message {
+  margin: 16px 0 0;
+  color: #17633f;
+  overflow-wrap: anywhere;
+}
+
+#empty-message {
+  color: #526174;
+}
+
+#project-list {
+  padding-left: 24px;
+}
+
+#project-list li {
+  margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+
+/* Responsive layout for small screens */
+@media (max-width: 560px) {
+  body {
+    padding: 16px;
+  }
+
+  header {
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  section {
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  button {
+    width: 100%;
+  }
+}
