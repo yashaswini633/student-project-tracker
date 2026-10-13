@@ -129,6 +129,10 @@ button:focus-visible {
   overflow-wrap: anywhere;
 }
 
+#project-list button {
+  margin: 4px 8px 4px 0;
+}
+
 /* Responsive layout for small screens */
 @media (max-width: 560px) {
   body {
