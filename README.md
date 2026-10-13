@@ -11,7 +11,7 @@ Built as a workshop learning project. It runs locally only.
 Use Node.js 22 (22.18 or newer, below 23; tested on 22.23.3) and a PowerShell terminal in this folder.
 
 ```powershell
-npm.cmd install
+npm.cmd ci
 npm.cmd start
 ```
 
@@ -20,7 +20,7 @@ Open http://localhost:3000. Keep the server terminal running. Stop it with Ctrl+
 On Node 22 the terminal prints `ExperimentalWarning: SQLite is an experimental feature`.
 This is expected and is not an error.
 
-To run the API test:
+To run the API test (it checks the API, not browser interactions):
 
 ```powershell
 npm.cmd test
@@ -92,7 +92,7 @@ to the database separately from the SQL text.
 
 ## Limitations
 
-- Local demo only; it is not hosted online.
+- Local demo only; it is not hosted online. Cloud hosting would need separate server and database configuration.
 - No login and no separate users: everyone using this server sees the same list.
 - The database file `data/projects.db` stays on this computer and is not uploaded to GitHub.
 - Projects saved by the earlier browser-storage version are not moved into the database.
