@@ -1,4 +1,3 @@
-
 const STORAGE_KEY = 'workshop-projects-v1';
 
 const form = document.querySelector('#project-form');
@@ -51,7 +50,10 @@ function loadProjects() {
       return;
     }
 
-    projects = savedProjects;
+    // Older saves used "Planning"; the form and API use "Planned".
+    projects = savedProjects.map(project =>
+      project.status === 'Planning' ? { ...project, status: 'Planned' } : project
+    );
   } catch (error) {
     storageReady = false;
     emptyMessage.textContent =
@@ -129,6 +131,7 @@ form.addEventListener('submit', event => {
   const status = statusInput.value;
 
   if (!name) {
+    showMessage('Enter a project name.');
     nameInput.focus();
     return;
   }
