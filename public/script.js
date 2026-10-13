@@ -1,4 +1,28 @@
-const STORAGE_KEY = 'workshop-projects-v1';
+async function request(path, options = {}) {
+  const response = await fetch(path, options);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || `Request failed (${response.status})`);
+  }
+
+  return data;
+}
+
+const store = {
+  list: () => request('/api/projects'),
+  create: project => request('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(project)
+  }),
+  update: (id, project) => request(`/api/projects/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(project)
+  }),
+  remove: id => request(`/api/projects/${id}`, { method: 'DELETE' })
+};
 
 const form = document.querySelector('#project-form');
 const nameInput = document.querySelector('#project-name');
@@ -11,72 +35,24 @@ const cancelButton = document.querySelector('#cancel-button');
 
 let projects = [];
 let editingId = null;
-let storageReady = true;
+let busy = false;
 
 function showMessage(message) {
   formMessage.textContent = message;
 }
 
-function isValidProjects(data) {
-  return Array.isArray(data) && data.every(project =>
-    project !== null &&
-    typeof project === 'object' &&
-    typeof project.id === 'string' &&
-    project.id.length > 0 &&
-    typeof project.name === 'string' &&
-    typeof project.status === 'string'
-  );
+function showError(error) {
+  showMessage(`${error.message} Check that the server is running.`);
 }
 
-function loadProjects() {
-  try {
-    const savedText = localStorage.getItem(STORAGE_KEY);
-
-    if (savedText === null) {
-      projects = [];
-      return;
-    }
-
-    const savedProjects = JSON.parse(savedText);
-
-    if (!isValidProjects(savedProjects)) {
-      storageReady = false;
-      emptyMessage.textContent =
-        'Saved projects could not be loaded because the stored data is invalid.';
-
-      showMessage(
-        'Saved data has been preserved. Changes are disabled until it is checked.'
-      );
-      return;
-    }
-
-    // Older saves used "Planning"; the form and API use "Planned".
-    projects = savedProjects.map(project =>
-      project.status === 'Planning' ? { ...project, status: 'Planned' } : project
-    );
-  } catch (error) {
-    storageReady = false;
-    emptyMessage.textContent =
-      'Saved projects could not be loaded.';
-
-    showMessage(
-      'Storage could not be read. Existing saved data has not been overwritten.'
-    );
-  }
-}
-
-function saveProjects() {
-  try {
-    const projectsText = JSON.stringify(projects);
-    localStorage.setItem(STORAGE_KEY, projectsText);
-    showMessage('Changes saved in this browser.');
-    return true;
-  } catch (error) {
-    showMessage(
-      'Changes could not be saved to this browser. They may be lost when you refresh.'
-    );
-    return false;
-  }
+function setBusy(value) {
+  busy = value;
+  form.querySelectorAll('input, select, button').forEach(element => {
+    element.disabled = value;
+  });
+  projectList.querySelectorAll('button').forEach(element => {
+    element.disabled = value;
+  });
 }
 
 function renderProjects() {
@@ -109,21 +85,22 @@ function renderProjects() {
   });
 }
 
+async function refreshProjects() {
+  projects = await store.list();
+  renderProjects();
+}
+
 function resetEditMode() {
   editingId = null;
   form.reset();
   saveButton.textContent = 'Add Project';
   cancelButton.hidden = true;
-  nameInput.focus();
 }
 
-form.addEventListener('submit', event => {
+form.addEventListener('submit', async event => {
   event.preventDefault();
 
-  if (!storageReady) {
-    showMessage(
-      'Cannot change projects until the saved data issue is checked.'
-    );
+  if (busy) {
     return;
   }
 
@@ -136,47 +113,36 @@ form.addEventListener('submit', event => {
     return;
   }
 
-  if (editingId !== null) {
-    const project = projects.find(
-      item => item.id === editingId
-    );
+  setBusy(true);
+  showMessage('Saving...');
 
-    if (!project) {
-      showMessage('The project being edited could not be found.');
-      resetEditMode();
-      return;
+  try {
+    if (editingId !== null) {
+      await store.update(editingId, { name, status });
+    } else {
+      await store.create({ name, status });
     }
 
-    project.name = name;
-    project.status = status;
-  } else {
-    projects.push({
-      id: crypto.randomUUID(),
-      name: name,
-      status: status
-    });
+    resetEditMode();
+    await refreshProjects();
+    showMessage('Project saved on the server.');
+  } catch (error) {
+    showError(error);
+  } finally {
+    setBusy(false);
+    nameInput.focus();
   }
-
-  renderProjects();
-  resetEditMode();
-  saveProjects();
 });
 
-projectList.addEventListener('click', event => {
+projectList.addEventListener('click', async event => {
   const button = event.target.closest('button[data-project-id]');
 
-  if (!button) {
+  if (!button || busy) {
     return;
   }
 
-  if (!storageReady) {
-    showMessage(
-      'Cannot change projects until the saved data issue is checked.'
-    );
-    return;
-  }
-
-  const projectId = button.dataset.projectId;
+  // The server uses numeric ids; data attributes are always text.
+  const projectId = Number(button.dataset.projectId);
 
   const project = projects.find(
     item => item.id === projectId
@@ -206,28 +172,34 @@ projectList.addEventListener('click', event => {
       return;
     }
 
-    const index = projects.findIndex(
-      item => item.id === projectId
-    );
+    setBusy(true);
+    showMessage('Deleting...');
 
-    if (index === -1) {
-      return;
+    try {
+      await store.remove(projectId);
+
+      if (editingId === projectId) {
+        resetEditMode();
+      }
+
+      await refreshProjects();
+      showMessage('Project deleted.');
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy(false);
     }
-
-    projects.splice(index, 1);
-
-    if (editingId === projectId) {
-      resetEditMode();
-    }
-
-    renderProjects();
-    saveProjects();
   }
 });
 
 cancelButton.addEventListener('click', () => {
   resetEditMode();
+  nameInput.focus();
 });
 
-loadProjects();
-renderProjects();
+setBusy(true);
+showMessage('Loading projects...');
+refreshProjects()
+  .then(() => showMessage(''))
+  .catch(showError)
+  .finally(() => setBusy(false));
