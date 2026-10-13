@@ -1,6 +1,19 @@
 async function request(path, options = {}) {
-  const response = await fetch(path, options);
-  const data = await response.json();
+  let response;
+
+  try {
+    response = await fetch(path, options);
+  } catch (error) {
+    throw new Error('Could not reach the server.');
+  }
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch (error) {
+    throw new Error(`Unexpected server response (${response.status}).`);
+  }
 
   if (!response.ok) {
     throw new Error(data.error || `Request failed (${response.status})`);
@@ -32,6 +45,7 @@ const emptyMessage = document.querySelector('#empty-message');
 const formMessage = document.querySelector('#form-message');
 const saveButton = document.querySelector('#save-button');
 const cancelButton = document.querySelector('#cancel-button');
+const emptyText = emptyMessage.textContent;
 
 let projects = [];
 let editingId = null;
@@ -87,6 +101,7 @@ function renderProjects() {
 
 async function refreshProjects() {
   projects = await store.list();
+  emptyMessage.textContent = emptyText;
   renderProjects();
 }
 
@@ -201,5 +216,9 @@ setBusy(true);
 showMessage('Loading projects...');
 refreshProjects()
   .then(() => showMessage(''))
-  .catch(showError)
+  .catch(error => {
+    // A failed load is not the same as an empty list.
+    emptyMessage.textContent = 'Projects could not be loaded.';
+    showError(error);
+  })
   .finally(() => setBusy(false));
