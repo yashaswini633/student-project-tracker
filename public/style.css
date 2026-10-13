@@ -1,3 +1,21 @@
+/* Retro theme: cream paper, chunky outlines, hard shadows, monospace type */
+:root {
+  --paper: #f5ecd3;
+  --panel: #fffaf0;
+  --ink: #1d1a16;
+  --muted: #5a5246;
+  --navy: #1f2a5c;
+  --amber: #ffb000;
+  --amber-dark: #e09600;
+  --teal: #2ec4b6;
+  --teal-dark: #21a093;
+  --red: #c92a2a;
+  --red-dark: #a51f1f;
+  --pad: 24px;
+  --edge: 3px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+}
+
 /* Base styles */
 * {
   box-sizing: border-box;
@@ -6,11 +24,15 @@
 body {
   margin: 0;
   padding: 24px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: "Courier New", Consolas, "Lucida Console", monospace;
   line-height: 1.6;
-  color: #1f2937;
-  background-color: #f3f6f8;
+  color: var(--ink);
+  background-color: var(--paper);
+  /* Faint graph-paper grid */
+  background-image:
+    linear-gradient(rgba(29, 26, 22, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 26, 22, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 main {
@@ -21,33 +43,57 @@ main {
 /* Page heading */
 header {
   margin-bottom: 32px;
+  padding: 20px var(--pad);
+  color: var(--paper);
+  background-color: var(--navy);
+  border: var(--edge);
+  box-shadow: var(--shadow);
 }
 
 h1 {
   margin: 0 0 8px;
-  color: #16324f;
+  color: var(--amber);
   font-size: 2rem;
   line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 var(--ink);
 }
 
 header p {
   margin: 0;
-  color: #526174;
+  color: var(--paper);
 }
 
-/* Content sections */
+header p::before {
+  content: "> ";
+  color: var(--teal);
+}
+
+/* Content sections, styled like old desktop windows */
 section {
-  margin-bottom: 24px;
-  padding: 24px;
-  background-color: #ffffff;
-  border: 1px solid #dce3e9;
-  border-radius: 12px;
+  margin-bottom: 32px;
+  padding: var(--pad);
+  background-color: var(--panel);
+  border: var(--edge);
+  box-shadow: var(--shadow);
 }
 
 h2 {
-  margin: 0 0 20px;
-  color: #16324f;
-  font-size: 1.35rem;
+  margin: calc(var(--pad) * -1) calc(var(--pad) * -1) 20px;
+  padding: 8px var(--pad);
+  color: var(--ink);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background-color: var(--amber);
+  /* Title-bar stripes */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 10px,
+    rgba(29, 26, 22, 0.12) 10px 12px
+  );
+  border-bottom: var(--edge);
 }
 
 /* Form layout */
@@ -62,7 +108,9 @@ form div {
 }
 
 label {
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 input,
@@ -72,69 +120,142 @@ select {
   min-height: 44px;
   padding: 10px 12px;
   font: inherit;
-  color: inherit;
+  color: var(--ink);
   background-color: #ffffff;
-  border: 1px solid #aab7c4;
-  border-radius: 6px;
+  border: var(--edge);
+  border-radius: 0;
+  box-shadow: inset 3px 3px 0 rgba(29, 26, 22, 0.12);
 }
 
 input::placeholder {
-  color: #738195;
+  color: #6f6657;
 }
 
-/* Primary action */
+/* Buttons: chunky keys that press down */
 button {
   width: fit-content;
   min-height: 44px;
   padding: 10px 20px;
   font: inherit;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #16734b;
-  border: 1px solid #16734b;
-  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background-color: var(--amber);
+  border: var(--edge);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--ink);
   cursor: pointer;
+  transition: transform 0.05s, box-shadow 0.05s;
 }
 
 button:hover {
-  background-color: #105b3b;
-  border-color: #105b3b;
+  background-color: var(--amber-dark);
+}
+
+button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+button:disabled {
+  color: var(--muted);
+  background-color: #d8cfb8;
+  cursor: not-allowed;
+}
+
+#cancel-button,
+button[data-action="edit"] {
+  background-color: var(--teal);
+}
+
+#cancel-button:hover,
+button[data-action="edit"]:hover {
+  background-color: var(--teal-dark);
+}
+
+button[data-action="delete"] {
+  color: #ffffff;
+  background-color: var(--red);
+}
+
+button[data-action="delete"]:hover {
+  background-color: var(--red-dark);
+}
+
+#cancel-button:disabled,
+button[data-action]:disabled {
+  color: var(--muted);
+  background-color: #d8cfb8;
 }
 
 /* Visible keyboard focus */
 input:focus-visible,
 select:focus-visible,
 button:focus-visible {
-  outline: 3px solid #2563eb;
+  outline: 3px dashed var(--navy);
   outline-offset: 3px;
 }
 
 /* Feedback and project list */
 #form-message {
+  min-height: 1.6em;
   margin: 16px 0 0;
-  color: #17633f;
+  color: var(--navy);
+  font-weight: 700;
   overflow-wrap: anywhere;
+}
+
+#form-message:not(:empty)::before {
+  content: ">> ";
 }
 
 #empty-message {
-  color: #526174;
+  color: var(--muted);
 }
 
 #project-list {
-  padding-left: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 #project-list li {
-  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background-color: var(--paper);
+  border: var(--edge);
   overflow-wrap: anywhere;
 }
 
+#project-list li:last-child {
+  margin-bottom: 0;
+}
+
+#project-list li span {
+  color: var(--muted);
+}
+
 #project-list button {
-  margin: 4px 8px 4px 0;
+  padding: 6px 14px;
+}
+
+/* Push the Edit and Delete pair to the right edge */
+#project-list button[data-action="edit"] {
+  margin-left: auto;
 }
 
 /* Responsive layout for small screens */
 @media (max-width: 560px) {
+  :root {
+    --pad: 18px;
+    --shadow: 4px 4px 0 var(--ink);
+  }
+
   body {
     padding: 16px;
   }
@@ -144,15 +265,32 @@ button:focus-visible {
   }
 
   h1 {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
   }
 
   section {
-    padding: 18px;
-    margin-bottom: 18px;
+    margin-bottom: 24px;
   }
 
-  button {
+  form button {
     width: 100%;
+  }
+
+  #project-list li span {
+    flex-basis: 100%;
+  }
+
+  #project-list button {
+    flex: 1;
+  }
+
+  #project-list button[data-action="edit"] {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
   }
 }
